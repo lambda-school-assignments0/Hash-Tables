@@ -54,6 +54,7 @@ class HashTable:
 
         Fill this in.
         '''
+        self.storage[self.capacity] = {key: value}
         pass
 
 
