@@ -7,6 +7,23 @@ class LinkedPair:
         self.value = value
         self.next = None
 
+
+class LinkedList:
+    def __init__(self):
+        self.head = None
+
+    def add_to_head(self, key, value):
+        # <insert_description> (TODO)
+        pass
+
+    def contains(self, key):
+        # <insert_description> (TODO)
+        pass
+
+    def remove(self, key):
+        # <insert_description> (TODO)
+        pass
+
 class HashTable:
     '''
     A hash table that with `capacity` buckets
@@ -15,6 +32,7 @@ class HashTable:
     def __init__(self, capacity):
         self.capacity = capacity  # Number of buckets in the hash table
         self.storage = [None] * capacity
+        self.count = 0
 
 
     def _hash(self, key):
@@ -54,8 +72,15 @@ class HashTable:
 
         Fill this in.
         '''
-        self.storage[self.capacity] = {key: value}
-        pass
+        hashed_key = self._hash_mod(key)
+
+        # store value if hashed index is None
+        if self.storage[hashed_key] == None:
+            self.storage[hashed_key] = (key, value)
+            self.count += 1
+        # store value in linked list if collision (TODO)
+        else:
+            pass
 
 
 
@@ -67,7 +92,15 @@ class HashTable:
 
         Fill this in.
         '''
-        pass
+        hashed_key = self._hash_mod(key)
+        
+        # remove if key, value pair at hashed index
+        if self.storage[hashed_key] != None:
+            self.storage[hashed_key] = None
+            self.count -= 1
+        # print warning statement if nothing at hashed index
+        else:
+            print("There's nothing here to remove!")
 
 
     def retrieve(self, key):
@@ -78,7 +111,11 @@ class HashTable:
 
         Fill this in.
         '''
-        pass
+        hashed_key = self._hash_mod(key)
+
+        # returns value at hashed index, should automatically return None
+        # if nothing stored at hashed index
+        return self.storage[hashed_key][1]
 
 
     def resize(self):
@@ -88,7 +125,9 @@ class HashTable:
 
         Fill this in.
         '''
-        pass
+        # <insert_description> (TODO)
+        self.storage += [None] * self.capacity
+        self.capacity += self.capacity
 
 
 
