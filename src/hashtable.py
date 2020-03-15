@@ -13,16 +13,32 @@ class LinkedList:
         self.head = None
 
     def add_to_head(self, key, value):
-        # <insert_description> (TODO)
-        pass
+        # adds key, value pair to head of linked list
+        placeholder = self.head
+        self.head = LinkedPair(key, value)
+        self.head.next = placeholder
 
     def contains(self, key):
-        # <insert_description> (TODO)
-        pass
+        # takes key and returns value if available
+        if self.head == None:
+            return None
+        current = self.head
+        while current != None:
+            if current.key == key:
+                return current.value
+            else:
+                current = current.next
 
     def remove(self, key):
-        # <insert_description> (TODO)
-        pass
+        if self.head.key == key:
+            self.head = self.head.next
+            return key
+        current = self.head
+        while current.next != None:
+            if current.next.key == key:
+                current.next = current.next.next
+                return key
+        return "(key, value) pair not found!"
 
 class HashTable:
     '''
@@ -33,6 +49,10 @@ class HashTable:
         self.capacity = capacity  # Number of buckets in the hash table
         self.storage = [None] * capacity
         self.count = 0
+
+    
+    def __len__(self):
+        return self.capacity
 
 
     def _hash(self, key):
@@ -78,10 +98,15 @@ class HashTable:
         if self.storage[hashed_key] == None:
             self.storage[hashed_key] = (key, value)
             self.count += 1
-        # store value in linked list if collision (TODO)
+        # store value in linked list if collision
+        elif type(self.storage[hashed_key]) == tuple:
+            placeholder = self.storage[hashed_key]
+            self.storage[hashed_key] = LinkedList()
+            self.storage[hashed_key].head = LinkedPair(placeholder[0], placeholder[1])
+            self.storage[hashed_key].add_to_head(key, value)
+        # store value in linked list when there's already a collision here
         else:
-            pass
-
+            self.storage[hashed_key].add_to_head(key, value)
 
 
     def remove(self, key):
@@ -93,14 +118,17 @@ class HashTable:
         Fill this in.
         '''
         hashed_key = self._hash_mod(key)
-        
-        # remove if key, value pair at hashed index
-        if self.storage[hashed_key] != None:
+
+        # print warning statement if nothing at hashed index
+        if self.storage[hashed_key] == None:
+            print("(key, value) pair not found!")
+        # remove if key, value pair at hashed index and is not linked list
+        elif type(self.storage[hashed_key]) == tuple:
             self.storage[hashed_key] = None
             self.count -= 1
-        # print warning statement if nothing at hashed index
+        # remove if key, value pair at hashed index and is linked list
         else:
-            print("There's nothing here to remove!")
+            self.storage[hashed_key].remove(key)
 
 
     def retrieve(self, key):
@@ -115,7 +143,12 @@ class HashTable:
 
         # returns value at hashed index, should automatically return None
         # if nothing stored at hashed index
-        return self.storage[hashed_key][1]
+        if self.storage[hashed_key] == None:
+            return None
+        elif type(self.storage[hashed_key]) == tuple:
+            return self.storage[hashed_key][1]
+        else:
+            return self.storage[hashed_key].contains(key)
 
 
     def resize(self):
@@ -125,10 +158,25 @@ class HashTable:
 
         Fill this in.
         '''
-        # <insert_description> (TODO)
-        self.storage += [None] * self.capacity
+        # store old self.storage into old_storage to iterate over later
+        old_storage = self.storage
+        # create new HashTable with double capacity
         self.capacity += self.capacity
-
+        self.storage = [None] * self.capacity
+        # iterate over old_storage to populate new self.storage
+        for item in old_storage:
+            # handle if storage item is None
+            if item == None:
+                pass
+            # if storage item is tuple, re-insert
+            elif type(item) == tuple:
+                self.insert(item[0], item[1])
+            # if storage item is linked list, iterate over linked list while re-inserting
+            else:
+                current = item.head
+                while current != None:
+                    self.insert(current.key, current.value)
+                    current = current.next
 
 
 if __name__ == "__main__":
